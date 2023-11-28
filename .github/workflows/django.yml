@@ -44,6 +44,13 @@ jobs:
     - name: Install jq
       run: sudo apt-get install jq -y
 
+    - name: Get Labels
+      run: |
+        labels_response=$(curl -s "https://api.github.com/repos/nicoloboo02/decide/pulls/${{ github.event.number }}/labels")
+        echo "Labels response: $labels_response"
+        labels=$(echo $labels_response | jq -r '.[].name')
+        echo "Extracted labels: $labels"
+
     - name: Run Tests based on Labels
       run: |
         labels=$(curl -s "https://api.github.com/repos/nicoloboo02/decide/pulls/${{ github.event.number }}/labels" | jq -r '.[].name')
