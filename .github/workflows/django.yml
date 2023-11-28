@@ -1,9 +1,9 @@
-name: Dynamic tests
+name: Dynamic Tests on Pull Request
 
 on:
-  issue_comment:
-    types:
-      - created
+  pull_request:
+    branches:
+      - develop
 
 jobs:
   test:
@@ -16,7 +16,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.9'
+        python-version: '3.10'
 
     - name: Install Dependencies
       run: |
@@ -24,22 +24,19 @@ jobs:
         pip install -r requirements.txt
 
     - name: Apply Migrations
-      run:  |
+      run: | 
         cd decide
         python manage.py migrate
 
-    - name: Check for Label Comment
+    - name: Install jq
+      run: sudo apt-get install jq -y
+
+    - name: Run Tests based on Labels
       run: |
-        comment=$(cat $GITHUB_EVENT_PATH | jq -r '.comment.body')
         labels=$(curl -s "https://api.github.com/repos/nicoloboo02/decide/pulls/${{ github.event.number }}/labels" | jq -r '.[].name')
-
-        if [[ "$comment" == *"Labels añadidas"* ]]; then
-          for label in $labels; do
-            echo "Running tests for module: $label"
-            cd decide
-            python manage.py test $label
-          done
-        else
-          echo "No 'Labels añadidas' comment found. Skipping tests."
-        fi
-
+        
+        for label in $labels; do
+          echo "Running tests for module: $label"
+          cd decide 
+          python manage.py test $label
+        done
