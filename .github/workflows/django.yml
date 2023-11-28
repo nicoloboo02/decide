@@ -45,16 +45,24 @@ jobs:
       run: sudo apt-get install jq -y
 
     - name: Get Labels
+      id: get_labels
       run: |
-        labels_response=$(curl -s "https://api.github.com/repos/nicoloboo02/decide/pulls/${{ github.event.number }}/labels")
-        echo "Labels response: $labels_response"
-        labels=$(echo $labels_response | jq -r '.[].name')
+        pr_number=${{ github.event.number }}
+        pr_url="https://api.github.com/repos/nicoloboo02/decide/pulls/$pr_number"
+        pr_response=$(curl -s "$pr_url")
+        if [[ $(echo "$pr_response" | jq -r '.message') == "Not Found" ]]; then
+          echo "Error: Pull request not found. Please check if the PR number is correct."
+          exit 1
+        fi
+    
+        echo "Pull Request response: $pr_response"
+        labels=$(echo "$pr_response" | jq -r '.labels[].name')
         echo "Extracted labels: $labels"
+
 
     - name: Run Tests based on Labels
       run: |
-        labels=$(curl -s "https://api.github.com/repos/nicoloboo02/decide/pulls/${{ github.event.number }}/labels" | jq -r '.[].name')
-        
+        labels=${{ steps.get_labels.outputs.labels }}
         for label in $labels; do
           echo "Running tests for module: $label"
           cd decide 
