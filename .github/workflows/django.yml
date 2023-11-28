@@ -3,7 +3,7 @@ name: Dynamic Tests on Pull Request
 on:
   pull_request:
     branches:
-      - develop
+      - master
 
 jobs:
   test:
