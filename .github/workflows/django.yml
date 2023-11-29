@@ -62,10 +62,12 @@ jobs:
 
     - name: Run Tests based on Labels
       run: |
-        labels=${{ steps.get_labels.outputs.labels }}
-        for label in $labels; do
-          echo "Running tests for module: $label"
-          cd decide 
-          test_output=$(python manage.py test $label)
-          echo "$test_output"
-        done
+          pr_number=${{ github.event.number }}
+          pr_url="https://api.github.com/repos/nicoloboo02/decide/pulls/$pr_number"
+          pr_response=$(curl -s "$pr_url")
+          labels=$(echo "$pr_response" | jq -r '.labels[].name')
+          for label in $labels; do
+            echo "Running tests for module: $label"
+            cd decide 
+            python manage.py test $label
+          done
