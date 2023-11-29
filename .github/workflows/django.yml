@@ -66,8 +66,8 @@ jobs:
           pr_url="https://api.github.com/repos/nicoloboo02/decide/pulls/$pr_number"
           pr_response=$(curl -s "$pr_url")
           labels=$(echo "$pr_response" | jq -r '.labels[].name')
+          cd decide
           for label in $labels; do
             echo "Running tests for module: $label"
-            cd decide 
             python manage.py test $label
           done
