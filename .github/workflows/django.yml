@@ -69,5 +69,5 @@ jobs:
           cd decide
           for label in $labels; do
             echo "Running tests for module: $label"
-            python manage.py test --exlude-tag=slow $label
+            python manage.py test --exclude-tag=slow $label
           done
