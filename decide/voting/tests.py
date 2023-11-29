@@ -26,6 +26,7 @@ from datetime import datetime
 
 class VotingTestCase(BaseTestCase):
 
+    
     def setUp(self):
         super().setUp()
 
