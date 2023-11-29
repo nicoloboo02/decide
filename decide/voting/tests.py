@@ -92,6 +92,7 @@ class VotingTestCase(BaseTestCase):
                 mods.post('store', json=data)
         return clear
 
+    @tag("slow")
     def test_complete_voting(self):
         v = self.create_voting()
         self.create_voters(v)
